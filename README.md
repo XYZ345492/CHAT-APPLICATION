@@ -29,3 +29,8 @@ Message Timestamps: Include timestamps for each message to provide context on wh
 Reconnect Logic: Implement logic to automatically attempt to reconnect if the WebSocket connection is lost.
 
 Styling Enhancements: Consider adding animations or transitions for a smoother user experience.
+
+Output
+
+![image](https://github.com/user-attachments/assets/b5b01cc7-eec8-4947-a67f-7ba02431e3f6)
+
