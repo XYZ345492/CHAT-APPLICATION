@@ -1,11 +1,11 @@
 # CHAT-APPLICATION
 
-name : Sameer L
+name   : T GANESH
 company : CODTECH IT SOLUTIONS
-id : CDO8DVI 
+id : CT08HUQ
 domain : full stack web development
 duration : dec to jan 2025
-mentor : Muzammil Ahmed
+mentor :NEELA SANTHOSH KUMAR
 #output of the code image2
 
 Overview of the Chat Application Key Features Real-Time Messaging: Utilizes WebSocket to enable real-time communication between the user and a bot. Messages are sent and received instantly.
