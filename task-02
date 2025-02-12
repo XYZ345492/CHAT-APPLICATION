@@ -1,0 +1,102 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+interface Message {
+  sender: 'user' | 'other';
+  text: string;
+}
+
+const ChatApp: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const socketRef = useRef<WebSocket | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Establish WebSocket connection
+    socketRef.current = new WebSocket('wss://echo.websocket.events'); // Using a public echo server for demo purpose
+
+    socketRef.current.onopen = () => {
+      console.log('WebSocket connection opened.');
+    };
+
+    socketRef.current.onmessage = (event) => {
+      console.log('Message received:', event.data);
+      setMessages((prevMessages) => [...prevMessages, { sender: 'other', text: event.data }]);
+    };
+
+    socketRef.current.onclose = () => {
+      console.log('WebSocket connection closed.');
+    };
+
+    socketRef.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, []);
+
+    // Scroll to bottom on new messages
+    useEffect(() => {
+        if(chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    if (inputValue.trim() && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(inputValue);
+      setMessages((prevMessages) => [...prevMessages, { sender: 'user', text: inputValue }]);
+      setInputValue('');
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-100">
+      <header className="bg-blue-500 text-white p-4 text-center">
+        <h1 className="text-2xl font-bold">Real-time Chat</h1>
+      </header>
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-2">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`rounded-xl py-2 px-4 max-w-xs ${
+                message.sender === 'user' ? 'bg-blue-200 text-gray-800' : 'bg-gray-200 text-gray-800'
+              }`}
+            >
+              {message.text}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="p-4 flex items-center border-t border-gray-300">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          value={inputValue}
+          onChange={handleInputChange}
+          className="flex-1 border border-gray-300 rounded-md px-3 py-2 mr-2 focus:outline-none focus:border-blue-500"
+        />
+        <button
+          onClick={handleSendMessage}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ChatApp;
